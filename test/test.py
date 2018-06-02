@@ -1,7 +1,4 @@
-# A dictionary of movie critics and ther ratings of a small set of movies.
-
-
-crtics={
+critics={
     'Lisa Rose': {'Lady in the Water': 2.5, 'Snakes on a Plane': 3.5, 'Just My Luck': 3.0, 'Superman Returns': 3.5, 'You, Me and Dupree': 2.5, 'The Night Listener': 3.0},
     'Gene Seymour': {'Lady in the Water': 3.0, 'Snakes on a Plane': 3.5, 'Just My Luck': 1.5, 'Superman Returns': 5.0, 'You, Me and Dupree': 3.5, 'The Night Listener': 3.0},
     'Michael Phillips': {'Lady in the Water': 2.5, 'Snakes on a Plane': 3.0, 'Superman Returns': 3.5, 'The Night Listener': 4.0},
@@ -10,3 +7,13 @@ crtics={
     'Jack Matthews': {'Lady in the Water': 3.0, 'Snakes on a Plane': 4.0, 'Superman Returns': 5.0, 'You, Me and Dupree': 3.5, 'The Night Listener': 3.0},
     'Toby': {'Snakes on a Plane': 4.5, 'Superman Returns': 4.0, 'You, Me and Dupree': 1.0,},
 }
+
+si = {'Lady in the Water': 1, 'Snakes on a Plane': 1, 'Just My Luck': 1, 'Superman Returns': 1, 'You, Me and Dupree': 1, 'The Night Listener': 1}
+
+def test(a, person):
+
+    si = {'Lady in the Water': 1, 'Snakes on a Plane': 1, 'Just My Luck': 1, 'Superman Returns': 1, 'You, Me and Dupree': 1, 'The Night Listener': 1}
+
+    run = [a[person][item]for item in si]
+    return run
+
