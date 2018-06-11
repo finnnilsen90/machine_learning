@@ -17,3 +17,11 @@ def test(a, person):
     run = [a[person][item]for item in si]
     return run
 
+class Adder(object):
+        def __init__(self, num=0):
+            self.num = num
+
+        def __iadd__(self, other):
+            print('in __iadd__', other)
+            self.num = self.num + other
+            return self.num
