@@ -141,21 +141,56 @@ class searcher:
     def __del__(self):
         self.con.close()
 
+    # def getmatchrows(self,q):
+    #     # String to build the query
+    #     fieldlist='w0.urlid'
+    #     tablelist=''
+    #     clauselist=''
+    #     wordids=[]
+
+    #     # Split the words by spaces
+    #     words=q.split(' ')
+    #     tablenumber=0
+
+    #     for word in words:
+    #         # Get the word ID
+    #         wordrow=self.con.execute(
+    #             "select rowid from wordlist where word='%s'" % word).fetchone()
+    #         if wordrow!=None:
+    #             wordid=wordrow[0]
+    #             wordids.append(wordid)
+    #             if tablenumber>0:
+    #                 tablelist+=','
+    #                 clauselist+=' and '
+    #                 clauselist+='w%d.urlid=w%d.urlid and ' % (tablenumber-1,tablenumber)
+    #             fieldlist+=',w%d.location' % tablenumber
+    #             tablelist+='wordloaction w%d' % tablenumber
+    #             clauselist+='w%d.wordid=%d' % (tablenumber,wordid)
+    #             tablenumber+=1
+
+    #     #Create the query from the separate parts
+    #     fullquery='select %s from %s where %s' % (fieldlist,tablelist,clauselist)
+    #     cur=self.con.execute(fullquery)
+    #     rows=[row for row in cur]
+
+    #     return row, wordids
+
+
     def getmatchrows(self,q):
-        # String to build the query
+        # Strings to build the query
         fieldlist='w0.urlid'
-        tablelist=''
+        tablelist=''  
         clauselist=''
         wordids=[]
 
         # Split the words by spaces
-        words=q.split(' ')
+        words=q.split(' ')  
         tablenumber=0
 
         for word in words:
-            # Get the word ID
+        # Get the word ID
             wordrow=self.con.execute(
-                "select rowid from wordlist where word='%s'" % word).fetchone()
+            "select rowid from wordlist where word='%s'" % word).fetchone()
             if wordrow!=None:
                 wordid=wordrow[0]
                 wordids.append(wordid)
@@ -164,13 +199,14 @@ class searcher:
                     clauselist+=' and '
                     clauselist+='w%d.urlid=w%d.urlid and ' % (tablenumber-1,tablenumber)
                 fieldlist+=',w%d.location' % tablenumber
-                tablelist+='wordloaction w%d' % tablenumber
+                tablelist+='wordlocation w%d' % tablenumber      
                 clauselist+='w%d.wordid=%d' % (tablenumber,wordid)
                 tablenumber+=1
 
-        #Create the query from the separate parts
+        # Create the query from the separate parts
         fullquery='select %s from %s where %s' % (fieldlist,tablelist,clauselist)
+        print(fullquery)
         cur=self.con.execute(fullquery)
         rows=[row for row in cur]
 
-        return row, wordids
+        return rows,wordids
