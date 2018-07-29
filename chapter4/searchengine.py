@@ -4,6 +4,9 @@ from urllib.parse import urljoin
 import sqlite3 as sql
 import re
 
+import nn
+mynet=nn.searchnet('nn.db')
+
 # Create a list of words to ifnore
 ignorewords=set(['the','of','to','and','a','in','is','it'])
 
@@ -259,6 +262,7 @@ class searcher:
         for (score,urlid) in rankedscores[0:10]:
             # print('score => '+str(score))
             print('%f\t%s' % (score,self.geturlname(urlid)))
+        return wordids,[r[1] for r in rankedscores[0:10]]
 
     def normalizescores(self,scores,smallIsBetter=0):
         vsmall=0.0001 # Avoid division by zero errors
@@ -318,3 +322,9 @@ class searcher:
         normalizedscores=dict([(u,float(1)/maxscore) for (u,l) in linkscores.items()])
         return normalizedscores 
 
+    def nnscore(self,rows,wordids):
+        #Get unique URL IDs as an ordered list
+        urlids=[urlid for urlid in set([row[0] for row in rows])]
+        nnres=mynet.getresult(wordids,urlids)
+        scores=dict([(urlids[i],nnres[i]) for i in range(len(urlids))])
+        return self.normalizedscores(scores)
