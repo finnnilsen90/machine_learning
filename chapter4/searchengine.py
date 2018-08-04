@@ -226,7 +226,7 @@ class searcher:
 
         # Create the query from the separate parts
         fullquery='select %s from %s where %s' % (fieldlist,tablelist,clauselist)
-        print(fullquery)
+        # print(fullquery)
         cur=self.con.execute(fullquery)
         rows=[row for row in cur]
 
@@ -280,17 +280,17 @@ class searcher:
     def wordfrequency(self,q):
         wrows,wordids=self.getmatchrows(q)
         # Counts number of words in a row.
-        # url,word_data,location=self.con.execute('select * from wordlist')
-        print(wrows)
-
+       
+        wordrow=self.con.execute("select * from wordlist").fetchall()
+        
         # Get numerator
         word_count=self.frequencyscore(wrows)
         num=len(word_count.keys())
     
-
         # Get denominator = total words in the query
-        # den=
-        return num
+        den=len(wordrow)
+        result=float(num/den)
+        return result*100
 
     # Scores based off of how high a search term appears in a page. 
     def locationscore(self,rows):
