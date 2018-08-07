@@ -279,19 +279,19 @@ class searcher:
 
     def wordfrequency(self,q):
         wrows,wordids=self.getmatchrows(q)
-        # Counts number of words in a row.
-       
-        wordrow=self.con.execute("select * from wordlist").fetchall()
-        
-        # Get numerator
-        word_count=self.frequencyscore(wrows)
-        num=len(word_count.keys())
-    
-        # Get denominator = total words in the query
-        den=len(wordrow)
-        result=float(num/den)
-        return result*100
 
+        num=dict([(row[0],0) for row in wrows])
+        for row in wrows: num[row[0]]+=1
+
+        for row in num:
+            wordrow=self.con.execute("select urlid from wordlocation where rowid=%s" % row).fetchone()
+            urlcount=self.con.execute("select * from wordlocation where urlid=%s" % wordrow).fetchall()
+
+            num[row]=+num[row]/len(urlcount)
+    
+        return self.normalizescores(num)
+          
+  
     # Scores based off of how high a search term appears in a page. 
     def locationscore(self,rows):
         locations=dict([(row[0],1000000) for row in rows])
