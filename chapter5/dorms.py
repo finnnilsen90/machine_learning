@@ -34,4 +34,22 @@ def printsolution(vec):
         print(prefs[i][0],dorm)
         # Remove this slot
         del slots[x]
-        
+
+def dormcost(vec):
+    cost=0
+    # Create list a of slots
+    slots=[0,0,1,1,2,2,3,3,4,4]
+
+    # Loop over each student
+    for i in range(len(vec)):
+        x=int(vec[i])
+        dorm=dorms[slots[x]]
+        pref=prefs[i][1]
+        # First choice costs 0, second choice costs 1
+        if pref[0]==dorm: cost+=0
+        elif pref[1]==dorm: cost+=1
+        else: cost+=3
+
+        # Remove selected slot
+        del slots[x]
+    return cost
