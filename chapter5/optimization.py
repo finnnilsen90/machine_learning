@@ -249,8 +249,7 @@ def twogeneticoptimize(domain,costf,popsize=50,step=1,mutprob=0.2,elite=0.2,maxi
                 res=mutate(ranked[c])
                 if res!=None:
                     pop.append(res)
-                    # print('Mut None input => '+str(ranked[c]))
-                    # print('Mut None result => '+str(test))
+
             else:
             
                 # Crossover
@@ -259,9 +258,6 @@ def twogeneticoptimize(domain,costf,popsize=50,step=1,mutprob=0.2,elite=0.2,maxi
                 res=crossover(ranked[c1],ranked[c2])
                 if res!=None:
                     pop.append(res)
-                else:
-                    # print('Cross None input => '+str(ranked[c1])+' and '+str(ranked[c2]))
-                    # print('Cross None result => '+str(test))
 
         # Print current best score
         print(scores[0][0])
