@@ -57,6 +57,37 @@ class classifier:
         # Increment the count for this category
         self.incc(cat)
 
+    def fprob(self,f,cat):
+        if self.catcount(cat)==0: return 0
+        # The total number of times this feature appeared in this
+        # category divided by the toal number of items in this category
+        return self.fcount(f,cat)/self.catcount(cat)
+
+    def weightedprob(self,f,cat,prf,weight=1.0,ap=0.5):
+        # Calculate current probability
+        basicprob=prf(f,cat)
+
+        # Count the number of times this feture has appeared in all categories
+        totals=sum([self.fcount(f,c) for c in self.categories()])
+
+        # Calculate the weighted average
+        bp=((weight*ap)+(totals*basicprob))/(weight+totals)
+        return bp
+
+class naivebayes(classifier):
+    def docprob(self,item,cat):
+        features=self.getfeatures(item)
+
+        # Multiply the probabilities of all the features together
+        p=1
+        for f in features: p*=self.weightedprob(f,cat,self.fprob)
+        return p
+
+    def prob(self,item,cat):
+        catprob=self.catcount(cat)/self.totalcount()
+        docprob=self.docprob(item,cat)
+        return docprob*catprob
+
 def sampletrain(cl):
     cl.train('Nobody owns the water','good')
     cl.train('the quick rabbit jumps fences','good')
