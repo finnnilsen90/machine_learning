@@ -1,6 +1,7 @@
 import re
 import math
 
+# Processes words to return a unique set of words. 
 def getwords(doc):
     splitter=re.compile('\\W*')
     # Split the words by non-alpha characters
@@ -9,13 +10,23 @@ def getwords(doc):
     # Return the unique set of words only
     return dict([(w,1) for w in words])
 
+
+# Classifies items into categories
 class classifier:
+
     def __init__(self,getfeatures,filename=None):
         # Counts of feature/category combinations
         self.fc={}
         # Counts of documents in each category
         self.cc={}
         self.getfeatures=getfeatures
+
+    def setthreshold(self,cat,t):
+        self.thresholds[cat]=t 
+    
+    def getthreshold(self,cat):
+        if cat not in self.thresholds: return 1.0
+        return self. thresholds[cat]
 
     # Increase the count of a feature/category pair
     def incf(self,f,cat):
@@ -74,7 +85,33 @@ class classifier:
         bp=((weight*ap)+(totals*basicprob))/(weight+totals)
         return bp
 
+    def classify(self,item,default=None):
+        probs={}
+        # Find the cateogry with the heighest probability.
+        max=0.0
+        for cat in self.categories():
+            probs[cat]=self.prob(item,cat)
+            if probs[cat]>max:
+                max=probs[cat]
+                best=cat
+
+        # Make sure the probability exceeds threshold*next best
+        for cat in probs:
+            if cat==best: continue
+            if probs[cat]*self.getthreshold(best)>probs[best]: return default
+        return best
+
+
+### Naive Bayes Classifier ###        
+# Classifier that determines the probability of an item being in a certain category. 
+# Assumes probabilities being combined are independent of one another.
 class naivebayes(classifier):
+
+    def __init__(self,getfeatures):
+        classifier.__init__(self,getfeatures)
+        self.thresholds={}
+
+
     def docprob(self,item,cat):
         features=self.getfeatures(item)
 
@@ -87,6 +124,29 @@ class naivebayes(classifier):
         catprob=self.catcount(cat)/self.totalcount()
         docprob=self.docprob(item,cat)
         return docprob*catprob
+
+### Fisher Classifier ###
+# The Fisher method calculates the probabilities and tests to see if the set
+# of probabilities is more or less likely than a random set. This method
+# also returns a probability for each category that can be compared to the others. 
+
+# Calculate three things.
+# clf = Pr(feature | cateogry) for this category
+# freqsum = Sum of Pr(feature | category) for all the categories
+# cprob = clf/(clf+nclf)
+class fisherclassifier(classifier):
+    def cprob(self,f,cat):
+        # The frequency of this feature in this category
+        clf=self.fprob(f,cat)
+        if clf==0: return 0
+
+        # The frequency of this feature in all the categories
+        freqsum=sum([self.fprob(f,c) for c in self.categories()])
+
+        # The probability is the frequency in this category divided by the overall frequency
+        p=clf/(freqsum)
+
+        return p
 
 def sampletrain(cl):
     cl.train('Nobody owns the water','good')
