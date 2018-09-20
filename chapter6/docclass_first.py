@@ -29,58 +29,42 @@ class classifier:
         if cat not in self.thresholds: return 1.0
         return self. thresholds[cat]
 
-    def setdb(self,dbfile):
-        self.con=sqlite.connect(dbfile)
-        self.con.execute('create table if not exists fc(feature,category,count)')
-        self.con.execute('create table if not exists cc(category,count)')
-
     # Increase the count of a feature/category pair
     def incf(self,f,cat):
-        count=self.fcount(f,cat)
-        if count==0:
-            self.con.execute("insert into fc values ('%s','%s',1)" % (f,cat))
-        else:
-            self.con.execute("update fc set count=%d where feature='%s' and category='%s'" % (count,f,cat))
+        self.fc.setdefault(f,{})
+        self.fc[f].setdefault(cat,0)
+        self.fc[f][cat]+=1
+
+    # Increase the count of a category
+    def incc(self,cat):
+        self.cc.setdefault(cat,0)
+        self.cc[cat]+=1
 
     # The number of times a feature has appeared in a category
     def fcount(self,f,cat):
-        res=self.con.execute('select count from fc where feature="%s" and category="%s"'%(f,cat)).fetchone()
-        # res=self.con.execute("select count from fc where feature='%s' and category='%s'" %(f,cat)).fetchone()
-
-        if res==None: return 0
-        else: return float(res[0])
-
-     # Increase the count of a category
-    def incc(self,cat):
-        count=self.catcount(cat)
-        if count==0:
-            self.con.execute("insert into cc values ('%s',1)" % (cat))
-        else:
-            self.con.execute("update cc set count=%d where category='%s'" % (count+2,cat))
+        if f in self.fc and cat in self.fc[f]:
+            return float(self.fc[f][cat])
+        return 0.0
 
     # The number of items in a category
     def catcount(self,cat):
-         res=self.con.execute("select count from cc where category='%s'" %(cat)).fetchone()
-         if res==None: return 0
-         else: return float(res[0])
+        if cat in self.cc:
+            return float(self.cc[cat])
+        return 0
 
     # The total number of items
     def totalcount(self):
-        res=self.con.execute('select sum(count) from cc').fetchone()
-        if res==None: return 0
-        return res[0]
+        return sum(self.cc.values())
 
     # The list of all categories
     def categories(self):
-        cur=self.con.execute('select category from cc')
-        return [d[0] for d in cur]
+        return self.cc.keys()
 
     def train(self,item,cat):
         features=self.getfeatures(item)
         # Increment the count for every feature with this category
         for f in features:
             self.incf(f,cat)
-        self.con.commit()
 
         # Increment the count for this category
         self.incc(cat)
