@@ -66,6 +66,9 @@ def dpclassify(point,avgs):
 
 ### CATEGORICAL FEATURES ###
 
+def veclength(v):
+  return sum([p**2 for p in v])
+
 def yesno(v):
     if v == 'yes': return 1
     if v == 'no': return -1
@@ -105,3 +108,42 @@ def scaledata(rows):
 
     # Return the new data and the funtion
     return newrows,scaleinput
+
+### KERNAL METHODS ###
+
+def rbf(v1,v2,gamma=20):
+    dv=[v1[i]-v2[i] for i in range(len(v1))]
+    l=veclength(dv)
+    return math.e**(-gamma*l)
+
+def nlclassify(point,rows, offset,gamma=10):
+    sum0=0.0
+    sum1=0.0
+    count0=0
+    count1=0
+
+    for row in rows:
+        if row.match==0:
+            sum0+=rbf(point,row.data,gamma)
+            count0+=1
+        else:
+            sum1+=rbf(point,row.data,gamma)
+            count1+=1
+    y=(1.0/count0)*sum0-(1.0/count1)*sum1+offset
+
+    if y<0: return 0
+    else: return 1
+
+def getoffset(rows,gamma=10):
+    l0=[]
+    l1=[]
+    for row in rows:
+        if row.match==0: l0.append(row.data)
+        else: l1.append(row.data)
+    sum0=sum(sum([rbf(v1,v2,gamma) for v1 in l0]) for v2 in l0)
+    sum1=sum(sum([rbf(v1,v2,gamma) for v1 in l1]) for v2 in l1)
+
+    return (1.0/(len(l1)**2))*sum1-(1.0/(len(l0)**2))**sum0
+
+### USING LIBSVM ###
+
