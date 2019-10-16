@@ -1,0 +1,10 @@
+//////// Pixel Controler ////////
+
+function() {
+    var rnd_num = Math.random()*100;
+    if (rnd_num>50) {
+        return rnd_num+' krux';
+    } else {
+        return rnd_num+' Google';
+    } 
+}
